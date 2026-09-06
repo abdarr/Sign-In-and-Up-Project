@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.ColorInput?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="454.0" prefWidth="358.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.Abd.ui.ScenesControllers.LogInScene">
+   <children>
+      <PasswordField fx:id="passwordField" layoutX="92.0" layoutY="201.0" onAction="#passwordFieldAction" prefHeight="25.0" prefWidth="174.0" promptText="Password" />
+      <TextField fx:id="usernameField" layoutX="92.0" layoutY="157.0" onAction="#usernameFieldAction" prefHeight="25.0" prefWidth="174.0" promptText="Username" />
+      <Text layoutY="68.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sign In" textAlignment="CENTER" wrappingWidth="358.0">
+         <font>
+            <Font size="39.0" />
+         </font>
+      </Text>
+      <Hyperlink fx:id="signInButton" layoutX="156.0" layoutY="341.0" mnemonicParsing="false" onAction="#SignButtonAction" text="Sign In" textAlignment="CENTER" textFill="#007bff" underline="true">
+         <font>
+            <Font name="Arial Bold" size="12.0" />
+         </font>
+         <effect>
+            <Blend />
+         </effect>
+      </Hyperlink>
+      <Text layoutX="41.0" layoutY="336.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Dont have an Account?" textAlignment="CENTER" wrappingWidth="279.0">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Text>
+      <Button fx:id="signUpButton" layoutX="92.0" layoutY="270.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="174.0" text="LogIn"  onAction="#SignInButtonAction"/>
+       <Text
+               fx:id="errortext"
+               visible="false"
+               layoutX="92"
+               layoutY="255"
+               textAlignment="CENTER"
+               text="Username/Email or password incorrect"
+               strokeWidth="0.0"
+               fill="#fc4646">
+
+           <font>
+               <Font size="10.0" />
+           </font>
+       </Text>
+   </children>
+</AnchorPane>
