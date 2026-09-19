@@ -52,8 +52,9 @@ public class LogInScene {
 
         if(dataService.checkPassword(username,password)){
             if(!DataService.isUserVerified(username)){
+                EmailVerificationScene.emailorusername = username;
                 sceneManager.setScene(EMAILVERIFICATION);
-                DataService.
+
 
 
                 System.out.println("Logged in Successfully");

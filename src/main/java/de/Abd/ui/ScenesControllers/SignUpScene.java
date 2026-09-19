@@ -103,6 +103,8 @@ public class SignUpScene {
             DataService.saveUser(usernameField.getText(),passwordField.getText(),emailfield.getText());
             EmailVerificationService ss = new EmailVerificationService();
             ss.sendVerificationCode(emailfield.getText());
+
+            EmailVerificationScene.emailorusername = usernameField.getText();
             sceneManager.setScene(Screen.EMAILVERIFICATION);
         } else {
             System.out.println(result);

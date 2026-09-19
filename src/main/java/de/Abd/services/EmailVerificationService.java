@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.security.SecureRandom;
 
+import static de.Abd.services.DataService.CheckVerificationCode;
+
 public class EmailVerificationService {
 
     Properties props = new Properties();
@@ -67,11 +69,11 @@ public class EmailVerificationService {
 
     }
 
-    public void ResendVerificationCode(String email) throws SQLException {
 
-         DataService.deleteVerificationCode(DataService.findUserId(email));
 
-    }
+
+
+
 
 
 }

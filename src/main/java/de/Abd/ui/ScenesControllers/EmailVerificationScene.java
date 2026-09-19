@@ -1,9 +1,6 @@
 package de.Abd.ui.ScenesControllers;
 
-import de.Abd.Enum.Screen;
-import de.Abd.core.App;
 import de.Abd.services.*;
-import de.Abd.util.Ui;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
@@ -15,8 +12,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import static de.Abd.Enum.Screen.EMAILVERIFICATION;
+import de.Abd.ui.ScenesControllers.EmailVerificationScene;
+import static de.Abd.services.DataService.CheckVerificationCode;
 
 public class EmailVerificationScene {
+    static String emailorusername;
 
     @FXML
     private Button sumbitButton;
@@ -27,12 +27,23 @@ public class EmailVerificationScene {
 
     @FXML
 
-    private void CheckCode(){
+    private void CheckCode() throws SQLException {
+        String CVC = CheckVerificationCode(CodeField.getText(),emailorusername);
+
+        if (CVC == null){
+            System.out.println("user verification successful");
+        }else  {
+            System.out.println(CVC);
+            System.out.println("user verification failed");
+        }
+
 
     }
 
     @FXML
-    private void resendCode(){
+    private void resendCode() throws SQLException {
+        EmailVerificationService emailVerificationservice = new EmailVerificationService ();
+        emailVerificationservice.sendVerificationCode(DataService.getEmailFromUsername(emailorusername));
 
     }
 

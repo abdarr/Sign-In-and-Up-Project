@@ -76,9 +76,52 @@ public  class DataService {
 
     }
 
-    static public void CheckVerificationCode(String code,String email) throws SQLException {
+    static public String getUserNameFormEmail(String EmailOrUsername) throws SQLException {
+        try (Connection conn = connect(); PreparedStatement ps = conn.prepareStatement("SELECT username FROM USERS WHERE username= ? OR email = ?")){
+        ps.setString(1, EmailOrUsername);
+        ps.setString(2, EmailOrUsername);
+
+        ResultSet rs = ps.executeQuery();
+
+        if(!rs.next()) {
+
+            throw new SQLException();
+        }
+
+        return rs.getString("username");
+
+    }catch (SQLException e){
+            return "username not found/"+e.getMessage();
+        }
+
+}
+
+    static public String getEmailFromUsername(String EmailOrUsername) throws SQLException {
+        try (Connection conn = connect(); PreparedStatement ps = conn.prepareStatement("SELECT email FROM USERS WHERE username= ? OR email = ?")){
+            ps.setString(1, EmailOrUsername);
+            ps.setString(2, EmailOrUsername);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(!rs.next()) {
+
+                throw new SQLException();
+            }
+
+            return rs.getString("email");
+
+        }catch (SQLException e){
+            return "email not found/"+e.getMessage();
+        }
+    }
+
+    static public String CheckVerificationCode(String code,String email) throws SQLException {
 
         int id = findUserId(email);
+
+        if(DataService.isUserVerified(email)) {
+            return "user already verified";
+        }
 
         try (Connection conn = connect();PreparedStatement ps = conn.prepareStatement("SELECT * FROM verification_codes WHERE code = ? AND user_id = ? AND generated_at >= datetime('now','-10 minutes')")){
             ps.setString(1, code);
@@ -89,28 +132,26 @@ public  class DataService {
                 throw new SQLException("Verification code not found or expired");
             }
 
-
+            conn.close();
             verifyUser(id);
+            return null;
+        }catch (SQLException e){
+            return e.getMessage();
         }
     }
 
 
 
-    static public void deleteVerificationCode(int id) throws SQLException {
-        try (Connection conn = connect();PreparedStatement ps = conn.prepareStatement("DELETE FROM verification_codes WHERE user_id = ?")
-        ){
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        }
-    }
+
 
     static public void verifyUser(int id) throws SQLException {
-        try (Connection conn = connect();PreparedStatement ps = conn.prepareStatement("UPDATE USERS SET email_verified = 1 WHERE id = ?")) {
+        try (Connection conn = connect();PreparedStatement ps = conn.prepareStatement("UPDATE USERS SET email_verified = 1 WHERE id = ?");PreparedStatement ps2 = conn.prepareStatement("DELETE FROM verification_codes WHERE user_id = ?")){
 
 
             ps.setInt(1, id);
             ps.executeUpdate();
-            deleteVerificationCode(id);
+            ps2.setInt(1, id);
+            ps2.executeUpdate();
 
         }
     }
@@ -145,6 +186,8 @@ public  class DataService {
             throw new SQLException(e.getMessage());
         }
     }
+
+
 
 
     static public void saveUser(String username, String password, String email) throws SQLException {
