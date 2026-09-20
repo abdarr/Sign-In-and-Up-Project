@@ -1,7 +1,6 @@
 package de.Abd.services;
 
 import jakarta.mail.*;
-import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
@@ -9,7 +8,6 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.security.SecureRandom;
 
-import static de.Abd.services.DataService.CheckVerificationCode;
 
 public class EmailVerificationService {
 
@@ -42,11 +40,16 @@ public class EmailVerificationService {
      }
 
 
-    public void sendVerificationCode(String email) {
+    public void sendVerificationCode(String email) throws SQLException {
 
          Session session = jackartaInit();
          int verificationCode = GenerateVerificationCode();
          String emailFrom = System.getenv("EMAILFROM");
+
+         if(DataService.isUserVerified(email)){
+             throw  new SQLException("Email already verified");
+         }
+
         try {
             Message message = new MimeMessage(session);
 
@@ -55,11 +58,9 @@ public class EmailVerificationService {
              message.setSubject("Here is your verification code");
              message.setContent(String.valueOf(verificationCode), "text/html");
 
-             if (DataService.SaveVerificationCode(verificationCode,email)) {
-                 Transport.send(message);
-             }else{
-                 System.out.println("Something went wrong");
-             }
+            Transport.send(message);
+            DataService.SaveVerificationCode(verificationCode,email);
+
 
 
          } catch (MessagingException | SQLException e) {

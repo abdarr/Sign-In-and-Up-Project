@@ -6,7 +6,6 @@ import de.Abd.core.App;
 import de.Abd.services.SceneManager;
 import de.Abd.util.Ui;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.effect.ColorInput;
@@ -97,14 +96,18 @@ public class SignUpScene {
     @FXML
 
     private void signUpAction() throws SQLException, IOException {
+
+        String email = emailfield.getText().trim().toLowerCase();
+        String username = usernameField.getText().trim().toLowerCase();
+
        String result = DataService.CheckUserInput(usernameField,passwordField,emailfield);
 
         if (result == null) {
-            DataService.saveUser(usernameField.getText(),passwordField.getText(),emailfield.getText());
+            DataService.saveUser(username,passwordField.getText(),email);
             EmailVerificationService ss = new EmailVerificationService();
             ss.sendVerificationCode(emailfield.getText());
 
-            EmailVerificationScene.emailorusername = usernameField.getText();
+            EmailVerificationScene.emailorusername = usernameField.getText().trim().toLowerCase();
             sceneManager.setScene(Screen.EMAILVERIFICATION);
         } else {
             System.out.println(result);
@@ -114,13 +117,13 @@ public class SignUpScene {
 
     @FXML
     private void emailfieldKeyReleased() throws Exception {
-            if(UserEmailService.validateEmail(emailfield.getText()) == null){
+            if(UserEmailService.validateEmail(emailfield.getText().trim().toLowerCase()) == null){
                 emailfield.setStyle("-fx-border-color: green;");
                 Ui.setToolTipButton("#E53935",0,emailfield,"");
 
             }else{
                 emailfield.setStyle("-fx-border-color: red;");
-                Ui.setToolTipButton("#E53935",200,emailfield, UserEmailService.validateEmail(emailfield.getText()));
+                Ui.setToolTipButton("#E53935",200,emailfield, UserEmailService.validateEmail(emailfield.getText().trim().toLowerCase()));
             }
 
         if(emailfield.getText().isBlank()){

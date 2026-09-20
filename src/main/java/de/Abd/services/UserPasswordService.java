@@ -120,7 +120,7 @@ public class UserPasswordService {
     }
 
     public static String passwordScore(PasswordField passwordField) {
-        Result result = nbvcxz.estimate(passwordField.getText());
+        Result result = nbvcxz.estimate(passwordField.getText().trim().toLowerCase());
         if(result.getBasicScore() == 0) {
             return "Very Weak";
         } else if(result.getBasicScore() == 1) {

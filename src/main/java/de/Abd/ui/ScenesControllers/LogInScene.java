@@ -3,7 +3,6 @@ package de.Abd.ui.ScenesControllers;
 import de.Abd.Enum.Screen;
 import de.Abd.core.App;
 import de.Abd.services.*;
-import de.Abd.util.Ui;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import static de.Abd.Enum.Screen.EMAILVERIFICATION;
-import static de.Abd.Enum.Screen.SIGNIN;
 
 public class LogInScene {
 
@@ -45,20 +43,22 @@ public class LogInScene {
 
     private void SignInButtonAction() throws SQLException, IOException {
 
-        String username = usernameField.getText();
+        String username = usernameField.getText().trim().toLowerCase(); // email can be also used to log in
         String password = passwordField.getText();
 
         DataService dataService = new DataService();
 
-        if(dataService.checkPassword(username,password)){
+        if(dataService.checkPassword(DataService.getUserNameFrommEmail(username),password)){
             if(!DataService.isUserVerified(username)){
-                EmailVerificationScene.emailorusername = username;
+                EmailVerificationScene.emailorusername = username.trim().toLowerCase();
+                EmailVerificationService emailVerificationService = new EmailVerificationService();
+                emailVerificationService.sendVerificationCode(DataService.getEmailFromUsername(username));
                 sceneManager.setScene(EMAILVERIFICATION);
 
-
-
-                System.out.println("Logged in Successfully");
+                return;
             }
+
+            System.out.println("Logged in Successfully");
         }else{
             System.out.println("Password or Email Incorrect");
             signUpButton.setStyle("-fx-border-color: red;");

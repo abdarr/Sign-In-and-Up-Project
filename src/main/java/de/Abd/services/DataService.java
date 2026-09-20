@@ -20,13 +20,13 @@ public  class DataService {
     static public String CheckUserInput(TextField username, PasswordField password, TextField email) throws SQLException {
 
         String passwordScores = UserPasswordService.passwordScore(password);
-        String usernames = UsernameService.GetUsernameError(username.getText(), false);
+        String usernames = UsernameService.GetUsernameError(username.getText().trim().toLowerCase(), false);
 
         if (Objects.equals(passwordScores, "Very Weak") || Objects.equals(passwordScores, "Weak")) {
             return "Password is to weak";
         } else if (!UserPasswordService.validatePassword(password)) {
             return UserPasswordService.getPasswordError(password);
-        } else if (UserEmailService.validateEmail(email.getText()) != null) {
+        } else if (UserEmailService.validateEmail(email.getText().trim().toLowerCase()) != null) {
             return "invalid email address";
         } else return usernames;
     }
@@ -76,7 +76,7 @@ public  class DataService {
 
     }
 
-    static public String getUserNameFormEmail(String EmailOrUsername) throws SQLException {
+    static public String getUserNameFrommEmail(String EmailOrUsername) throws SQLException {
         try (Connection conn = connect(); PreparedStatement ps = conn.prepareStatement("SELECT username FROM USERS WHERE username= ? OR email = ?")){
         ps.setString(1, EmailOrUsername);
         ps.setString(2, EmailOrUsername);
@@ -156,15 +156,19 @@ public  class DataService {
         }
     }
 
-    static public boolean SaveVerificationCode(int verificationCode,String email) throws SQLException {
 
 
-        try (Connection conn = connect(); PreparedStatement  ps2 = conn.prepareStatement("SELECT id FROM users WHERE email = ?")  ; PreparedStatement ps1 = conn.prepareStatement("INSERT INTO verification_codes(user_id,code) VALUES (?,?)")) {
+    static public void SaveVerificationCode(int verificationCode,String email) throws SQLException {
 
 
-            ps2.setString(1, email);
+        try (Connection conn = connect(); PreparedStatement  psId = conn.prepareStatement("SELECT id FROM users WHERE email = ?"); // gets the id by using the email address
+             PreparedStatement psCheckCode = conn.prepareStatement("SELECT code FROM verification_codes WHERE user_id = ?"); // Checks if a verification code already exists
+             PreparedStatement psAddCode = conn.prepareStatement("INSERT INTO verification_codes(user_id,code) VALUES (?,?)"); // Adds the verification code into to the database
+             PreparedStatement psUpdateCode = conn.prepareStatement("UPDATE verification_codes SET code = ?, generated_at = CURRENT_TIMESTAMP WHERE user_id = ?"); // Updates the code and the timestamp if the code already exists
+        ) {
 
-            ResultSet id = ps2.executeQuery();
+            psId.setString(1, email);
+            ResultSet id = psId.executeQuery();
 
 
             if (!id.next()) {
@@ -173,15 +177,25 @@ public  class DataService {
 
             int userId = id.getInt("id");
 
+            psCheckCode.setInt(1, userId);
+            ResultSet checkCode = psCheckCode.executeQuery();
+
+            if (!checkCode.next()) {
+                psAddCode.setInt(1, userId );
+                psAddCode.setInt(2, verificationCode);
+
+                psAddCode.executeUpdate();
+                return;
+            }
+
+            psUpdateCode.setInt(1, verificationCode);
+            psUpdateCode.setInt(2, userId);
+            psUpdateCode.executeUpdate();
 
 
-            ps1.setInt(1, userId );
-            ps1.setInt(2, verificationCode);
-
-            ps1.executeUpdate();
 
 
-            return true;
+
         }catch (SQLException e){
             throw new SQLException(e.getMessage());
         }
@@ -195,9 +209,9 @@ public  class DataService {
         UserPasswordService userPasswordService = new UserPasswordService();
 
         try (Connection conn = connect(); PreparedStatement ps = conn.prepareStatement("INSERT INTO users (username,passwordhash,email,public_id) VALUES (?,?,?,?)")) {
-            ps.setString(1, username);
+            ps.setString(1, username.trim().toLowerCase());
             ps.setString(2, userPasswordService.hashPassword(password));
-            ps.setString(3, email);
+            ps.setString(3, email.trim().toLowerCase());
             ps.setString(4, UUIDGenerator.generateUUID());
             ps.executeUpdate();
         } catch (SQLException e) {
