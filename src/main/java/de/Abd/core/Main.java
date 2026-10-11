@@ -3,6 +3,7 @@ import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 
 import javafx.application.Application;
+
 import javafx.stage.Stage;
 import de.Abd.core.App;
 
@@ -23,6 +24,10 @@ public class Main extends Application {
         stage = Mainstage;
         App app = new App(Mainstage);
         app.start(Mainstage);
+
+
+
+
     }
 
     public Stage getMainstage(){

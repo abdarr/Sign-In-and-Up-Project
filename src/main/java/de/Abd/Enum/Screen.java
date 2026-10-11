@@ -1,11 +1,10 @@
 package de.Abd.Enum;
 
-import java.io.IOException;
-
 public enum Screen {
-    LOGIN("/Scenes/Loginscene.fxml"),
-    SIGNIN("/Scenes/Signinscene.fxml"),
-    EMAILVERIFICATION("/Scenes/EmailVerificationScene.fxml");
+    LOGIN("/Scenes/LogInScene.fxml"),
+    SIGNIN("/Scenes/SignInScene.fxml"),
+    EMAILVERIFICATION("/Scenes/EmailVerificationScene.fxml"),
+    SMTPINFO("/Scenes/smtpExample.fxml");
 
     private final String path;
 

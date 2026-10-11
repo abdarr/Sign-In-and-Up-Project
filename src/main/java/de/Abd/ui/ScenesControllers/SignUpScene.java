@@ -4,6 +4,7 @@ import de.Abd.services.*;
 import de.Abd.Enum.Screen;
 import de.Abd.core.App;
 import de.Abd.services.SceneManager;
+import de.Abd.util.Hotkeys;
 import de.Abd.util.Ui;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -80,6 +81,8 @@ public class SignUpScene {
 
 
 
+
+
     @FXML
     private void logInButtonAction() {
         System.out.println("button pressed");
@@ -104,8 +107,7 @@ public class SignUpScene {
 
         if (result == null) {
             DataService.saveUser(username,passwordField.getText(),email);
-            EmailVerificationService ss = new EmailVerificationService();
-            ss.sendVerificationCode(emailfield.getText());
+            EmailVerificationService.SendVerificationCode(email);
 
             EmailVerificationScene.emailorusername = usernameField.getText().trim().toLowerCase();
             sceneManager.setScene(Screen.EMAILVERIFICATION);

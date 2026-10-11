@@ -51,8 +51,7 @@ public class LogInScene {
         if(dataService.checkPassword(DataService.getUserNameFrommEmail(username),password)){
             if(!DataService.isUserVerified(username)){
                 EmailVerificationScene.emailorusername = username.trim().toLowerCase();
-                EmailVerificationService emailVerificationService = new EmailVerificationService();
-                emailVerificationService.sendVerificationCode(DataService.getEmailFromUsername(username));
+                EmailVerificationService.SendVerificationCode(DataService.getEmailFromUsername(username));
                 sceneManager.setScene(EMAILVERIFICATION);
 
                 return;

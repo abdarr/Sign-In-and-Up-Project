@@ -22,7 +22,7 @@ public class SceneManager {
         root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(state.getPath())));
         Mainstage.setScene(new Scene(root));
         Mainstage.show();
-        state = currentScene;
+        currentScene = state;
 
 
 

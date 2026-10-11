@@ -1,4 +1,7 @@
 package de.Abd.services;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.*;
 import java.util.Objects;
 
@@ -10,11 +13,38 @@ import javafx.scene.control.TextField;
 
 public  class DataService {
 
-    private static final String url = "jdbc:sqlite:USERS.db";
-
+    private static final Path database = Path.of(
+            System.getProperty("user.home"),
+            "JavaLoginProjekt",
+            "USERS.db"
+    );
 
     static public Connection connect() throws SQLException {
-        return DriverManager.getConnection(url);
+
+        try {
+            Files.createDirectories(database.getParent());
+        } catch (IOException e) {
+            throw new SQLException("Datenbankordner konnte nicht erstellt werden", e);
+        }
+
+        Connection conn = DriverManager.getConnection(
+                "jdbc:sqlite:" + database
+        );
+        try (Statement statement = conn.createStatement()){
+
+            statement.execute("PRAGMA foreign_keys = ON");
+
+        } catch (SQLException e) {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                e.addSuppressed(ex);
+            }
+            System.out.println("Error connecting to database" + e.getMessage());
+
+            throw e;
+        }
+        return conn;
     }
 
     static public String CheckUserInput(TextField username, PasswordField password, TextField email) throws SQLException {
@@ -140,7 +170,33 @@ public  class DataService {
         }
     }
 
+    public static void createTables() throws SQLException {
+        try(Connection conn = connect(); Statement ps =  conn.createStatement();Statement ps2 =  conn.createStatement()) {
 
+
+            ps.executeUpdate("""
+            CREATE TABLE IF NOT EXISTS USERS (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            public_id TEXT NOT NULL UNIQUE,
+            username TEXT NOT NULL UNIQUE,
+            passwordhash TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            email_verified INTEGER NOT NULL DEFAULT 0
+            CHECK(email_verified IN (0, 1)) )
+            """);
+
+            ps2.executeUpdate("""
+	        CREATE TABLE IF NOT EXISTS verification_codes (
+	        "user_id"	INTEGER NOT NULL UNIQUE,
+	        "code"	TEXT NOT NULL UNIQUE,
+	        "generated_at"	TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	        PRIMARY KEY("user_id" ),
+	        FOREIGN KEY("user_id") REFERENCES "USERS"("id"))"""
+            );
+
+
+        }
+    }
 
 
 
